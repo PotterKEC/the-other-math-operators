@@ -1,29 +1,35 @@
 import pytest
-from unittest.mock import patch
-from io import StringIO
 import sys
 import os
-import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-def test_spell_word():
-    # Redirect stdout to capture print statements
-    captured_output = StringIO()
-    sys.stdout = captured_output
-    
-    # Import and run the student's function
-    from assignment import spell_word
-    spell_word()
-    
-    # Get the printed output
-    output = captured_output.getvalue().strip()
-    
-    # Reset stdout
-    sys.stdout = sys.__stdout__
-    
-    # Split output into lines and remove any empty lines
-    letters = [line.strip() for line in output.split('\n') if line.strip()]
-    
-    # Check if the letters spell "PYTHON"
-    expected = ["P", "Y", "T", "H", "O", "N"]
-    assert letters == expected, f"Expected the letters to spell 'PYTHON', but got {''.join(letters)}"
+from assignment import (
+    create_player_tag,
+    calculate_points_needed,
+    create_team_roster,
+    distribute_powerups
+)
+
+def test_create_player_tag():
+    assert create_player_tag("Mario", 123) == "Mario#123"
+    assert create_player_tag("Luigi", 456) == "Luigi#456"
+    assert create_player_tag("Yoshi", 789) == "Yoshi#789"
+    assert create_player_tag("", 999) == "#999"  # Edge case: empty name
+
+def test_calculate_points_needed():
+    assert calculate_points_needed(100, 150) == 50
+    assert calculate_points_needed(0, 100) == 100
+    assert calculate_points_needed(50, 50) == 0
+    assert calculate_points_needed(200, 100) == -100  # Edge case: current > target
+
+def test_create_team_roster():
+    assert create_team_roster(3, "🏃") == "🏃🏃🏃"
+    assert create_team_roster(2, "⭐") == "⭐⭐"
+    assert create_team_roster(1, "🎮") == "🎮"
+    assert create_team_roster(0, "🎲") == ""  # Edge case: team size 0
+
+def test_distribute_powerups():
+    assert distribute_powerups(10, 3) == 1  # 10 ÷ 3 = 3 each, 1 remainder
+    assert distribute_powerups(100, 20) == 0  # Divides evenly
+    assert distribute_powerups(7, 2) == 1  # 7 ÷ 2 = 3 each, 1 remainder
+    assert distribute_powerups(5, 6) == 5  # Edge case: more players than powerups
